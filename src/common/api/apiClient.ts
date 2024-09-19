@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Axios 기본 설정을 가진 인스턴스 생성
 const apiClient = axios.create({
-  baseURL: "http://localhost:18010",
+  baseURL: import.meta.env.VITE_APP_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
