@@ -1,28 +1,43 @@
-<script setup lang="ts">
-import { RouterView } from 'vue-router'
-</script>
-
 <template>
-<!--  <header>-->
-<!--    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />-->
-
-<!--    <div class="wrapper">-->
-<!--      <HelloWorld msg="You did it!" />-->
-
-<!--      <nav>-->
-<!--        <RouterLink to="/">Home</RouterLink>-->
-<!--        <RouterLink to="/about">About</RouterLink>-->
-<!--      </nav>-->
-<!--    </div>-->
-<!--  </header>-->
-
-  <RouterView />
+  <div id="app">
+    <div class="header-container">
+      <HeaderView />
+    </div>
+    <div class="content-container">
+      <RouterView />
+    </div>
+  </div>
 </template>
+
+<script lang="ts">
+import HeaderView from '@/components/layout/HeaderView.vue'
+
+export default {
+  name: 'App',
+  components: {
+    HeaderView,
+  },
+};
+</script>
 
 <style scoped>
 header {
   line-height: 1.5;
   max-height: 100vh;
+}
+
+.header-container {
+  position: fixed; /* 고정 위치 */
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px; /* 헤더 높이 */
+  z-index: 1000; /* 다른 요소 위에 오도록 설정 */
+}
+
+.content-container {
+  margin-top: 70px; /* 헤더 높이만큼 여백 추가 */
+  padding: 2rem; /* 콘텐츠 패딩 */
 }
 
 .logo {
