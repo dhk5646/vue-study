@@ -13,14 +13,19 @@
         </thead>
         <tbody>
         <tr v-for="post in posts" :key="post.techBlogPostSeq">
-          <td>{{ post.techBlogEnum }}</td>
-          <td>
+          <td class="company-column">{{ post.techBlogEnum }}</td>
+          <td class="title-column">
             <a :href="post.url" target="_blank">{{ post.title }}</a>
           </td>
-          <td>{{ formatDate(post.publishedDateTime) }}</td>
+          <td class="date-column">{{ formatDate(post.publishedDateTime) }}</td>
         </tr>
         </tbody>
       </table>
+      <Pagination
+        :totalPages="totalPages"
+        :currentPage="currentPage"
+        @updatePage="handlePageUpdate"
+      />
     </div>
   </div>
 </template>
@@ -28,36 +33,43 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import apiClient from '@/common/api/apiClient';
+import Pagination from '@/components/pagination/Pagination.vue';  // Pagination 컴포넌트 임포트
+import { formatDate } from '@/common/utils/dateUtils'
 
 export default defineComponent({
   name: 'TechBlogPost',
+  methods: { formatDate },
+  components: { Pagination },
   setup() {
     const posts = ref([]);
     const loading = ref(true);
+    const currentPage = ref(1);
+    const pageSize = ref(10); // 페이지 크기 설정
+    const totalPages = ref(0); // 전체 페이지 수
 
-    // API를 호출하여 데이터를 가져오는 함수
-    const fetchPosts = async () => {
+    // API에서 포스트 데이터 가져오기
+    const fetchPosts = async (page: number = 1) => {
+      loading.value = true; // 로딩 상태 시작
+      currentPage.value = page;
       try {
-        const response = await apiClient.get('/tech-blog-post');
-        posts.value = response.data;
-        console.log(response);
+        const response = await apiClient.get(`/tech-blog-post?pageNumber=${page}&pageSize=${pageSize.value}`);
+        posts.value = response.data.content;
+        totalPages.value = response.data.pageData.totalPages; // 전체 페이지 수 업데이트
       } catch (error) {
         console.error('Failed to fetch tech blog posts:', error);
       } finally {
-        loading.value = false;
+        loading.value = false; // 로딩 상태 종료
       }
     };
 
-    // 컴포넌트가 마운트될 때 데이터를 가져옴
-    onMounted(fetchPosts);
+    // 컴포넌트 마운트 시 첫 페이지 로딩
+    onMounted(() => fetchPosts());
 
-    // 날짜 형식을 YYYY-MM-DD로 변환하는 함수
-    const formatDate = (dateString: string) => {
-      const date = new Date(dateString);
-      return date.toISOString().split('T')[0];
+    // 페이지 업데이트 핸들러
+    const handlePageUpdate = (newPage: number) => {
+      fetchPosts(newPage); // 페이지 번호에 맞는 데이터를 다시 로드
     };
-
-    return { posts, loading, formatDate };
+    return { posts, loading, totalPages, currentPage, fetchPosts, handlePageUpdate };
   },
 });
 </script>
@@ -92,9 +104,8 @@ export default defineComponent({
 
 .tech-blog-table th,
 .tech-blog-table td {
-  padding: 16px; /* 셀의 패딩을 늘려서 크기를 키움 */
+  padding: 15px; /* 셀의 패딩을 늘려서 크기를 키움 */
   border: 1px solid #ddd;
-  text-align: left;
 }
 
 .tech-blog-table th {
@@ -120,13 +131,18 @@ a:hover {
   text-decoration: underline;
 }
 
+.company-column {
+  text-align: center;
+}
+
 /* 특정 열의 너비 설정 */
 .title-column {
-  width: 1400px; /* 너비를 조정하여 Title 열을 더 넓게 설정 */
+  width: 700px; /* 너비를 조정하여 Title 열을 더 넓게 설정 */
 }
 
 /* 특정 열의 너비 설정 */
 .date-column {
-  width: 200px; /* 너비를 조정하여 Title 열을 더 넓게 설정 */
+  width: 150px; /* 너비를 조정하여 Title 열을 더 넓게 설정 */
+  text-align: center;
 }
 </style>
