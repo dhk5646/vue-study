@@ -1,7 +1,7 @@
 <template>
   <header class="header">
     <div class="logo-container">
-      <img src="@/assets/logo.svg" alt="Logo" class="logo"/>
+      <img src="@/assets/logo.png" alt="Logo" class="logo"/>
       <div class="search-container">
         <input
           type="text"
