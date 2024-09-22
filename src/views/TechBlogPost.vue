@@ -31,6 +31,7 @@ import apiClient from '@/common/api/apiClient'
 import Pagination from '@/components/pagination/Pagination.vue'
 import { formatDate } from '@/common/utils/dateUtils'
 import eventBus from '@/common/eventBus'
+import kakaoLogo from '@/assets/company/logo/kakao.png';
 
 export default defineComponent({
   name: 'TechBlogPost',
@@ -76,8 +77,8 @@ export default defineComponent({
     // 회사 로고 URL 반환
     const getCompanyLogo = (techBlogEnum: string) => {
       // 회사 이름에 따라 로고 URL 설정 (예시)
-      const logoMap: { [key: string]: URL } = {
-        KAKAO: new URL('@/assets/company/logo/kakao.png', import.meta.url),
+      const logoMap: { [key: string]: string } = {
+        KAKAO: kakaoLogo,
         // 기타 회사 로고 추가...
       };
       return logoMap[techBlogEnum] || '@/assets/log.svg';
