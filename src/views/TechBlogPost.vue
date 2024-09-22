@@ -83,7 +83,6 @@ export default defineComponent({
       return logoMap[techBlogEnum] || 'src/assets/log.svg';
     };
 
-    console.log(getCompanyLogo);
     return { posts, loading, totalPages, currentPage, fetchPosts, handlePageUpdate, getCompanyLogo };
   },
 });
