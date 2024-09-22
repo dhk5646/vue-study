@@ -76,11 +76,11 @@ export default defineComponent({
     // 회사 로고 URL 반환
     const getCompanyLogo = (techBlogEnum: string) => {
       // 회사 이름에 따라 로고 URL 설정 (예시)
-      const logoMap: { [key: string]: string } = {
-        KAKAO: 'src/assets/company/logo/kakao.png',
+      const logoMap: { [key: string]: URL } = {
+        KAKAO: new URL('@/assets/company/logo/kakao.png', import.meta.url),
         // 기타 회사 로고 추가...
       };
-      return logoMap[techBlogEnum] || 'src/assets/log.svg';
+      return logoMap[techBlogEnum] || '@/assets/log.svg';
     };
 
     return { posts, loading, totalPages, currentPage, fetchPosts, handlePageUpdate, getCompanyLogo };
