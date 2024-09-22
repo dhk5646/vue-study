@@ -36,8 +36,7 @@ header {
 }
 
 .content-container {
-  margin-top: 70px; /* 헤더 높이만큼 여백 추가 */
-  padding: 2rem; /* 콘텐츠 패딩 */
+  margin-top: 100px; /* 헤더 높이만큼 여백 추가 */
 }
 
 .logo {
