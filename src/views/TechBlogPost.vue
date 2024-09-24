@@ -26,6 +26,7 @@ import apiClient from '@/common/api/apiClient'
 import { formatDate } from '@/common/utils/dateUtils'
 import eventBus from '@/common/eventBus'
 import kakaoLogo from '@/assets/company/logo/kakao.png'
+import naverLogo from '@/assets/company/logo/naver.png'
 
 export default defineComponent({
   name: 'TechBlogPost',
@@ -104,6 +105,7 @@ export default defineComponent({
     const getCompanyLogo = (techBlogEnum: string) => {
       const logoMap: { [key: string]: string } = {
         KAKAO: kakaoLogo,
+        NAVER: naverLogo,
         // 다른 회사 로고 추가 가능...
       };
       return logoMap[techBlogEnum] || '@/assets/log.svg';
