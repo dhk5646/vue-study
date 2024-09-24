@@ -16,75 +16,100 @@
           </div>
         </div>
       </div>
-      <Pagination
-        :totalPages="totalPages"
-        :currentPage="currentPage"
-        @updatePage="handlePageUpdate"
-      />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch } from 'vue'
+import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue'
 import apiClient from '@/common/api/apiClient'
-import Pagination from '@/components/pagination/Pagination.vue'
 import { formatDate } from '@/common/utils/dateUtils'
 import eventBus from '@/common/eventBus'
-import kakaoLogo from '@/assets/company/logo/kakao.png';
+import kakaoLogo from '@/assets/company/logo/kakao.png'
 
 export default defineComponent({
   name: 'TechBlogPost',
   methods: { formatDate },
-  components: { Pagination },
   setup() {
-    const posts = ref([]);
+    const posts = ref<any[]>([]);
     const loading = ref(true);
     const currentPage = ref(1);
-    const pageSize = ref(12);
+    const pageSize = ref(100);
     const totalPages = ref(0);
     const searchQuery = ref('');
+    const isFetching = ref(false); // 현재 데이터를 가져오는 중인지 확인하는 변수
 
-    // 검색어가 변경될 때마다 API 호출
-    watch(() => eventBus.searchQuery, (newQuery) => {
-      searchQuery.value = newQuery;
-      fetchPosts();
-    });
+    // 스크롤 핸들러
+    const handleScroll = () => {
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const bottomPosition = document.documentElement.offsetHeight - 100;
+
+      if (scrollPosition >= bottomPosition && !isFetching.value) {
+        fetchPosts();
+      }
+    };
 
     // API에서 포스트 데이터 가져오기
-    const fetchPosts = async (page: number = 1) => {
-      loading.value = true;
-      currentPage.value = page;
+    const fetchPosts = async () => {
+
+      if (isFetching.value || (totalPages.value !== 0 && currentPage.value > totalPages.value)) return; // totalPages가 0인 경우에도 데이터 요청
+
+      loading.value = currentPage.value === 1; // 첫 페이지 로딩 상태
+      isFetching.value = true; // 데이터를 가져오는 중임을 표시
+
       try {
-        const response = await apiClient.get(`/tech-blog-post?query=${searchQuery.value}&pageNumber=${page}&pageSize=${pageSize.value}`);
-        posts.value = response.data.content;
+        const response = await apiClient.get(`/tech-blog-post`, {
+          params: {
+            query: searchQuery.value || '', // 검색어가 없을 경우에도 요청 보내기
+            pageNumber: currentPage.value,
+            pageSize: pageSize.value,
+          }
+        });
+
+        if (currentPage.value === 1) {
+          posts.value = response.data.content; // 첫 페이지일 경우 기존 데이터를 초기화
+        } else {
+          posts.value.push(...response.data.content); // 이후 페이지 데이터는 기존에 추가
+        }
+
         totalPages.value = response.data.pageData.totalPages;
+        currentPage.value++;
       } catch (error) {
         console.error('Failed to fetch tech blog posts:', error);
       } finally {
         loading.value = false;
+        isFetching.value = false; // 데이터 가져오기 완료
       }
     };
 
-    // 컴포넌트 마운트 시 첫 페이지 로딩
-    onMounted(() => fetchPosts());
+    // 검색어가 변경될 때마다 API 호출
+    watch(() => eventBus.searchQuery, (newQuery) => {
+      searchQuery.value = newQuery;
+      currentPage.value = 1; // 검색어가 변경되면 첫 페이지로 초기화
+      fetchPosts();
+    });
 
-    // 페이지 업데이트 핸들러
-    const handlePageUpdate = (newPage: number) => {
-      fetchPosts(newPage);
-    };
+    // 컴포넌트 마운트 시 첫 페이지 로딩 및 스크롤 이벤트 리스너 등록
+    onMounted(() => {
+      fetchPosts(); // 첫 페이지 로딩
+      window.addEventListener('scroll', handleScroll); // 스크롤 이벤트 등록
+    });
+
+    // 컴포넌트 언마운트 시 스크롤 이벤트 리스너 해제
+    onUnmounted(() => {
+      window.removeEventListener('scroll', handleScroll);
+    });
 
     // 회사 로고 URL 반환
     const getCompanyLogo = (techBlogEnum: string) => {
-      // 회사 이름에 따라 로고 URL 설정 (예시)
       const logoMap: { [key: string]: string } = {
         KAKAO: kakaoLogo,
-        // 기타 회사 로고 추가...
+        // 다른 회사 로고 추가 가능...
       };
       return logoMap[techBlogEnum] || '@/assets/log.svg';
     };
 
-    return { posts, loading, totalPages, currentPage, fetchPosts, handlePageUpdate, getCompanyLogo };
+    return { posts, loading, getCompanyLogo };
   },
 });
 </script>
@@ -97,7 +122,6 @@ export default defineComponent({
   font-family: 'Arial', sans-serif;
 }
 
-
 .loading {
   text-align: center;
   font-size: 1.5em;
@@ -107,8 +131,8 @@ export default defineComponent({
 .cards-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px; /* 카드 간격 */
-  justify-content: center; /* 가운데 정렬 */
+  gap: 20px;
+  justify-content: center;
   margin-bottom: 30px;
 }
 
@@ -151,7 +175,7 @@ export default defineComponent({
 
 .card-content {
   padding: 15px;
-  flex-grow: 1; /* 카드 내용이 남는 공간을 채우도록 설정 */
+  flex-grow: 1;
 }
 
 .card-title {
@@ -173,30 +197,5 @@ export default defineComponent({
 .card-date {
   font-size: 0.9em;
   color: #666;
-}
-
-.pagination {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-}
-
-.pagination button {
-  background-color: #1a73e8;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  margin: 0 5px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.pagination button:hover {
-  background-color: #155abc;
-}
-
-.pagination button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
 }
 </style>
