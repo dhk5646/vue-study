@@ -111,7 +111,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Spoqa+Han+Sans:wght@400;700&display=swap');
 
 .container {
   max-width: 1200px;
