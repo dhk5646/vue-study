@@ -2,17 +2,19 @@
   <div class="container">
     <div v-if="loading" class="loading">Loading...</div>
     <div v-else>
-      <div class="cards-container">
-        <div v-for="post in posts" :key="post.techBlogPostSeq" class="post-card">
-          <div class="card-header">
-            <img :src="getCompanyLogo(post.techBlogEnum)" alt="Company Logo" class="company-logo" />
-            <div class="card-company">{{ post.techBlogEnum }}</div>
-          </div>
-          <div class="card-content">
-            <h3 class="card-title">
-              <a :href="post.url" target="_blank">{{ post.title }}</a>
-            </h3>
-            <p class="card-date">{{ formatDate(post.publishedDateTime) }}</p>
+      <div class="posts-container">
+        <div v-for="post in posts" :key="post.techBlogPostSeq" class="post-row">
+          <div class="row-content">
+            <div class="post-details">
+              <h3 class="card-title">
+                <a :href="post.url" target="_blank">{{ post.title }}</a>
+              </h3>
+              <div class="company-info">
+                <img :src="getCompanyLogo(post.techBlogEnum)" alt="Company Logo" class="company-logo" />
+                <span class="card-company">{{ post.techBlogEnum }}</span>
+                <time class="card-date">{{ formatDate(post.publishedDateTime) }}</time>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -21,12 +23,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue'
-import apiClient from '@/common/api/apiClient'
-import { formatDate } from '@/common/utils/dateUtils'
-import eventBus from '@/common/eventBus'
-import kakaoLogo from '@/assets/company/logo/kakao.png'
-import naverLogo from '@/assets/company/logo/naver.png'
+import { defineComponent, onMounted, onUnmounted, ref, watch } from 'vue';
+import apiClient from '@/common/api/apiClient';
+import { formatDate } from '@/common/utils/dateUtils';
+import eventBus from '@/common/eventBus';
+import kakaoLogo from '@/assets/company/logo/kakao.png';
+import naverLogo from '@/assets/company/logo/naver.png';
 
 export default defineComponent({
   name: 'TechBlogPost',
@@ -38,9 +40,8 @@ export default defineComponent({
     const pageSize = ref(100);
     const totalPages = ref(0);
     const searchQuery = ref('');
-    const isFetching = ref(false); // 현재 데이터를 가져오는 중인지 확인하는 변수
+    const isFetching = ref(false);
 
-    // 스크롤 핸들러
     const handleScroll = () => {
       const scrollPosition = window.innerHeight + window.scrollY;
       const bottomPosition = document.documentElement.offsetHeight - 100;
@@ -50,27 +51,25 @@ export default defineComponent({
       }
     };
 
-    // API에서 포스트 데이터 가져오기
     const fetchPosts = async () => {
+      if (isFetching.value || (totalPages.value !== 0 && currentPage.value > totalPages.value)) return;
 
-      if (isFetching.value || (totalPages.value !== 0 && currentPage.value > totalPages.value)) return; // totalPages가 0인 경우에도 데이터 요청
-
-      loading.value = currentPage.value === 1; // 첫 페이지 로딩 상태
-      isFetching.value = true; // 데이터를 가져오는 중임을 표시
+      loading.value = currentPage.value === 1;
+      isFetching.value = true;
 
       try {
         const response = await apiClient.get(`/tech-blog-post`, {
           params: {
-            query: searchQuery.value || '', // 검색어가 없을 경우에도 요청 보내기
+            query: searchQuery.value || '',
             pageNumber: currentPage.value,
             pageSize: pageSize.value,
           }
         });
 
         if (currentPage.value === 1) {
-          posts.value = response.data.content; // 첫 페이지일 경우 기존 데이터를 초기화
+          posts.value = response.data.content;
         } else {
-          posts.value.push(...response.data.content); // 이후 페이지 데이터는 기존에 추가
+          posts.value.push(...response.data.content);
         }
 
         totalPages.value = response.data.pageData.totalPages;
@@ -79,34 +78,29 @@ export default defineComponent({
         console.error('Failed to fetch tech blog posts:', error);
       } finally {
         loading.value = false;
-        isFetching.value = false; // 데이터 가져오기 완료
+        isFetching.value = false;
       }
     };
 
-    // 검색어가 변경될 때마다 API 호출
     watch(() => eventBus.searchQuery, (newQuery) => {
       searchQuery.value = newQuery;
-      currentPage.value = 1; // 검색어가 변경되면 첫 페이지로 초기화
+      currentPage.value = 1;
       fetchPosts();
     });
 
-    // 컴포넌트 마운트 시 첫 페이지 로딩 및 스크롤 이벤트 리스너 등록
     onMounted(() => {
-      fetchPosts(); // 첫 페이지 로딩
-      window.addEventListener('scroll', handleScroll); // 스크롤 이벤트 등록
+      fetchPosts();
+      window.addEventListener('scroll', handleScroll);
     });
 
-    // 컴포넌트 언마운트 시 스크롤 이벤트 리스너 해제
     onUnmounted(() => {
       window.removeEventListener('scroll', handleScroll);
     });
 
-    // 회사 로고 URL 반환
     const getCompanyLogo = (techBlogEnum: string) => {
       const logoMap: { [key: string]: string } = {
         KAKAO: kakaoLogo,
         NAVER: naverLogo,
-        // 다른 회사 로고 추가 가능...
       };
       return logoMap[techBlogEnum] || '@/assets/log.svg';
     };
@@ -117,11 +111,13 @@ export default defineComponent({
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Spoqa+Han+Sans:wght@400;700&display=swap');
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 15px;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Spoqa Han Sans', sans-serif; /* 스포카한산스 적용 */
 }
 
 .loading {
@@ -130,74 +126,69 @@ export default defineComponent({
   color: #888;
 }
 
-.cards-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
+.posts-container {
   margin-bottom: 30px;
 }
 
-.post-card {
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-  width: 300px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.post-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.card-header {
-  background-color: #f9f9f9;
-  padding: 15px;
+.post-row {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #eee;
-}
-
-.company-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.card-company {
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #333;
-}
-
-.card-content {
   padding: 15px;
-  flex-grow: 1;
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.2s;
+}
+
+
+.row-content {
+  display: flex;
+  align-items: center;
+  margin: 2px 0;
+  width: 100%;
+}
+
+.post-details {
+  flex-grow: 1; /* 나머지 공간을 차지하게 설정 */
 }
 
 .card-title {
-  font-size: 1.4em;
-  font-weight: bold;
-  margin: 0 0 10px 0;
-  color: #1a73e8;
+  font-size: 1.4em; /* 제목 크기 조정 */
+  margin: 0;
+  letter-spacing: -0.8px; /* 글자 간격 조정 */
 }
 
 .card-title a {
   text-decoration: none;
+  font-weight: 500; /* 볼드 효과 적용 */
   color: inherit;
 }
 
 .card-title a:hover {
-  text-decoration: underline;
+  color: #1a73e8;
+}
+
+.company-info {
+  display: flex;
+  align-items: center;
+  margin-top: 5px; /* 제목과 회사 정보 간격 조정 */
+  justify-content: space-between; /* 양쪽 끝으로 정렬 */
+}
+
+.company-logo {
+  width: 25px; /* 로고 크기를 현재의 절반으로 조정 */
+  height: auto; /* 높이를 자동으로 설정 */
+  margin-right: 10px; /* 로고와 회사 이름 간격 조정 */
+}
+
+.card-company {
+  font-size: 1em; /* 회사명 크기 조정 */
+  color: #333;
+  letter-spacing: 0; /* 글자 간격 조정 */
 }
 
 .card-date {
-  font-size: 0.9em;
+  font-size: 1em; /* 날짜 크기 조정 */
   color: #666;
+  margin-left: auto; /* 날짜를 우측으로 정렬 */
+  letter-spacing: 0; /* 글자 간격 조정 */
 }
 </style>
