@@ -1,7 +1,7 @@
 <template>
   <header class="header">
     <div class="logo-container">
-      <img src="@/assets/logo.png" alt="Logo" class="logo"/>
+      <h1 class="logo-text">TECH POST</h1> <!-- 로고 텍스트 추가 -->
       <!-- 데스크탑 화면에서만 검색창 표시 -->
       <div class="search-container desktop-only">
         <input
@@ -74,9 +74,12 @@ const toggleMobileSearch = () => {
   align-items: center;
 }
 
-.logo {
-  height: 40px;
-  margin-right: 20px;
+.logo-text {
+  font-family: 'Spoqa Han Sans', sans-serif; /* 모던한 폰트 적용 */
+  font-size: 1.7em; /* 로고 크기 조정 (필요에 따라 조정 가능) */
+  font-weight: 900; /* 볼드 효과 적용 */
+  margin-right: 20px; /* 로고와 검색창 간격 조정 */
+  color: #333; /* 텍스트 색상 설정 */
 }
 
 .search-container {
@@ -103,6 +106,8 @@ const toggleMobileSearch = () => {
   background: none;
   cursor: pointer;
   padding: 10px;
+  display: flex; /* 아이콘 정렬을 위한 flex */
+  align-items: center; /* 세로 정렬 */
 }
 
 .search-icon {
@@ -128,7 +133,7 @@ const toggleMobileSearch = () => {
   top: 0;
   left: 0;
   width: 100%;
-  height: 60px;
+  height: 70px;
   background-color: white;
   display: flex;
   align-items: center;
