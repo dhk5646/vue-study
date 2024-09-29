@@ -190,4 +190,31 @@ export default defineComponent({
   margin-left: auto; /* 날짜를 우측으로 정렬 */
   letter-spacing: 0; /* 글자 간격 조정 */
 }
+
+/* 모바일 환경 스타일 */
+@media (max-width: 768px) {
+  .container {
+    padding: 0;
+  }
+
+  .post-row {
+    padding: 15px 0;
+  }
+
+  .card-title {
+    font-size: 1em;
+  }
+
+  .company-logo {
+    width: 15px;
+  }
+
+  .card-company {
+    font-size: 0.85em;
+  }
+
+  .card-date {
+    font-size: 0.85em;
+  }
+}
 </style>
