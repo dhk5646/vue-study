@@ -30,7 +30,8 @@
           v-model="searchQuery"
           @keyup.enter="handleSearch"
         />
-        <button class="close-button" @click="toggleMobileSearch">X</button>
+        <!-- X 버튼 클릭 시 검색어 초기화 -->
+        <button class="clear-button" @click="clearSearch">X</button>
         <button class="search-button" @click="handleSearch" type="button" tabindex="-1">
           <img src="@/assets/images/search.png" alt="Search Icon" class="search-icon"/>
         </button>
@@ -55,6 +56,11 @@ const handleSearch = () => {
 // 모바일 검색창 표시/숨기기 함수
 const toggleMobileSearch = () => {
   showMobileSearch.value = !showMobileSearch.value;
+};
+
+// 검색어 초기화 함수
+const clearSearch = () => {
+  searchQuery.value = '';
 };
 </script>
 
@@ -150,7 +156,8 @@ const toggleMobileSearch = () => {
   flex: 1;
 }
 
-.close-button {
+/* 검색어 초기화를 위한 X 버튼 */
+.clear-button {
   background: none;
   border: none;
   cursor: pointer;
