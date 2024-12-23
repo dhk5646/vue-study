@@ -7,7 +7,12 @@ const router = createRouter({
       path: '/',
       name: 'tech-blog-post',
       component: () => import('@/views/TechBlogPost.vue')
-    }
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/Login.vue')
+    },
   ]
 })
 

@@ -1,7 +1,7 @@
 <template>
   <header class="header">
     <div class="logo-container">
-      <h1 class="logo-text">TECH POST</h1> <!-- 로고 텍스트 추가 -->
+      <h1 class="logo-text">TECH POST</h1>
       <!-- 데스크탑 화면에서만 검색창 표시 -->
       <div class="search-container desktop-only">
         <input
@@ -36,6 +36,9 @@
           <img src="@/assets/images/search.png" alt="Search Icon" class="search-icon"/>
         </button>
       </div>
+
+      <!-- 로그인 버튼 추가 -->
+      <button class="login-button" @click="goToLogin">Login</button>
     </div>
   </header>
 </template>
@@ -43,6 +46,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import eventBus from '@/common/eventBus';
+import router from '@/router'
 
 const searchQuery = ref('');
 const showMobileSearch = ref(false);
@@ -62,6 +66,11 @@ const toggleMobileSearch = () => {
 const clearSearch = () => {
   searchQuery.value = '';
 };
+
+// 로그인 페이지로 이동하는 함수
+const goToLogin = () => {
+  router.push({ name: 'login' }); // 'login' 라우트로 이동
+};
 </script>
 
 <style scoped>
@@ -70,9 +79,9 @@ const clearSearch = () => {
   display: flex;
   align-items: center;
   padding: 0 20px;
-  background: white; /* 배경 색 추가 */
+  background: white;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  justify-content: space-between; /* 모바일에서 우측 섹션과 로고 섹션 간격 유지 */
+  justify-content: space-between;
 }
 
 .logo-container {
@@ -81,11 +90,11 @@ const clearSearch = () => {
 }
 
 .logo-text {
-  font-family: 'Spoqa Han Sans', sans-serif; /* 모던한 폰트 적용 */
-  font-size: 1.7em; /* 로고 크기 조정 (필요에 따라 조정 가능) */
-  font-weight: 900; /* 볼드 효과 적용 */
-  margin-right: 20px; /* 로고와 검색창 간격 조정 */
-  color: #333; /* 텍스트 색상 설정 */
+  font-family: 'Spoqa Han Sans', sans-serif;
+  font-size: 1.7em;
+  font-weight: 900;
+  margin-right: 20px;
+  color: #333;
 }
 
 .search-container {
@@ -94,8 +103,8 @@ const clearSearch = () => {
   border: 1px solid #ddd;
   border-radius: 25px;
   overflow: hidden;
-  width: 300px; /* 기본 너비 설정 */
-  max-width: 100%; /* 최대 너비를 100%로 설정하여 화면 크기에 맞춤 */
+  width: 300px;
+  max-width: 100%;
 }
 
 .search-input {
@@ -103,8 +112,8 @@ const clearSearch = () => {
   padding: 10px 15px;
   outline: none;
   font-size: 16px;
-  flex: 1; /* 남은 공간을 채우도록 설정 */
-  width: 0; /* flexbox 내에서 flex 기준으로 너비 조정 */
+  flex: 1;
+  width: 0;
 }
 
 .search-button {
@@ -112,8 +121,8 @@ const clearSearch = () => {
   background: none;
   cursor: pointer;
   padding: 10px;
-  display: flex; /* 아이콘 정렬을 위한 flex */
-  align-items: center; /* 세로 정렬 */
+  display: flex;
+  align-items: center;
 }
 
 .search-icon {
@@ -144,7 +153,7 @@ const clearSearch = () => {
   display: flex;
   align-items: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  z-index: 1000; /* 다른 요소 위에 나타나도록 설정 */
+  z-index: 1000;
   padding: 0 20px;
 }
 
@@ -156,7 +165,6 @@ const clearSearch = () => {
   flex: 1;
 }
 
-/* 검색어 초기화를 위한 X 버튼 */
 .clear-button {
   background: none;
   border: none;
@@ -173,13 +181,26 @@ const clearSearch = () => {
   display: none;
 }
 
-/* 모바일에서 스타일 조정 */
+.login-button {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 15px;
+  margin-left: 20px;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .search-container.desktop-only {
-    display: none; /* 데스크탑용 검색창 숨기기 */
+    display: none;
   }
   .mobile-only {
-    display: flex; /* 모바일에서 돋보기 버튼 보이기 */
+    display: flex;
   }
 }
 </style>

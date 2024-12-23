@@ -1,23 +1,28 @@
 <template>
   <div id="app">
     <div class="header-container">
-      <HeaderView />
+      <HeaderView v-show="isShowHeader" />
     </div>
-    <div class="content-container">
+
+    <!-- 콘텐츠 컨테이너에서 패딩을 조건부로 설정 -->
+    <div :class="['content-container', { 'has-header': isShowHeader }]">
       <RouterView />
     </div>
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import HeaderView from '@/components/layout/HeaderView.vue'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
-export default {
-  name: 'App',
-  components: {
-    HeaderView,
-  },
-};
+// 헤더를 숨길 페이지 목록
+const hideHeaderRoutes = ['login', 'signup', 'terms'];
+
+const route = useRoute();
+
+// 현재 라우트 이름이 목록에 없을 때만 헤더를 표시
+const isShowHeader = computed(() => !hideHeaderRoutes.includes(route.name as string))
 </script>
 
 <style scoped>
@@ -36,7 +41,12 @@ header {
 }
 
 .content-container {
-  margin-top: 80px; /* 헤더 높이만큼 여백 추가 */
+  /* 기본 패딩 없음 */
+}
+
+/* 헤더가 있을 때만 패딩 적용 */
+.content-container.has-header {
+  padding-top: 80px; /* 헤더 높이만큼 패딩 추가 */
 }
 
 .logo {
